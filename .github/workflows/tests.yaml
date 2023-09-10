@@ -1,4 +1,4 @@
-name: Python tests
+name: Python Development Checks
 
 on:
     - push
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v3
@@ -19,9 +19,34 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2
-      - name: Install the project dependencies
-        run: poetry install
-      - name: Test with pytest
-        run: poetry run pytest
+        run: pip3 install poetry
+
+      - name: Enable VirtualEnvs
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Cache VirtualEnvs
+        id: cache-virtualenvs
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Dependencies
+        if: steps.cache-virtualenvs.outputs.cache-hit != 'true'
+        run: poetry install --with dev --no-interaction
+
+      - name: Run linter
+        run: |
+          source .venv/bin/activate
+          flake8 .
+          black .
+          mypy .
+
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          pytest tests/

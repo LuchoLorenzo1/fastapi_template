@@ -1,6 +1,10 @@
 # FastAPI template
 
-requirements: `docker`, `docker-compose` and `poetry` (for tests)
+![Tests](https://github.com/LuchoLorenzo1/fastapi_template/actions/workflows/tests.yaml/badge.svg)
+
+* development check: checks that all tests pass and code is correctly formatted
+
+requirements: `docker`, `docker-compose` and `poetry`
 
 # Usage
 
@@ -12,4 +16,12 @@ For production: `docker-compose -f docker-compose.prod.yaml up`
 
 # Tests
 
-`poetry run pytest main.py`
+`poetry run pytest`
+
+# Code Format and Linter
+
+`poetry run black .`
+
+`poetry run flake8 .`
+
+`poetry run mypy .`
